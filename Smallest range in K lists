@@ -1,0 +1,58 @@
+Given K sorted lists of integers, KSortedArray[] of size N each. The task is to find the smallest range that includes at least one element from each of the K lists. If more than one such range's are found, return the first such range found.
+
+Example 1:
+
+Input:
+N = 5, K = 3
+KSortedArray[][] = {{1 3 5 7 9},
+                    {0 2 4 6 8},
+                    {2 3 5 7 11}}
+Output: 1 2
+Explanation: K = 3
+A:[1 3 5 7 9]
+B:[0 2 4 6 8]
+C:[2 3 5 7 11]
+Smallest range is formed by number 1
+present in first list and 2 is present
+in both 2nd and 3rd list.
+
+
+
+import heapq
+
+def findSmallestRange(KSortedArray, N, K):
+    min_heap = []
+    max_element = float('-inf')
+    range_start, range_end = float('-inf'), float('inf')
+
+    # Initialize the min-heap with the first element from each list
+    for i in range(K):
+        heapq.heappush(min_heap, (KSortedArray[i][0], i, 0))
+        max_element = max(max_element, KSortedArray[i][0])
+
+    while True:
+        # Get the minimum element from the min-heap
+        min_element, list_idx, idx = heapq.heappop(min_heap)
+
+        # Check if the current range is smaller than the previous smallest range
+        if max_element - min_element < range_end - range_start:
+            range_start, range_end = min_element, max_element
+
+        # Move to the next element in the list
+        if idx + 1 < N:
+            next_element = KSortedArray[list_idx][idx + 1]
+            heapq.heappush(min_heap, (next_element, list_idx, idx + 1))
+            max_element = max(max_element, next_element)
+        else:
+            break
+
+    return range_start, range_end
+
+# Example usage:
+N = 5
+K = 3
+KSortedArray = [[1, 3, 5, 7, 9],
+                [0, 2, 4, 6, 8],
+                [2, 3, 5, 7, 11]]
+result = findSmallestRange(KSortedArray, N, K)
+print(result)  # Output: (1, 2)
